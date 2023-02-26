@@ -10,7 +10,6 @@
   "author": "Deniz Lopes Gunes",
   "license": "MIT",
   "dependencies": {
-    "config": "^3.3.9",
     "express": "^4.18.2",
     "geoip-lite": "^1.4.7",
     "mongoose": "^6.10.0",

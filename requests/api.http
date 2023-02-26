@@ -1,4 +1,4 @@
-POST https://shortn-api-mofx.vercel.app/api/url/shorten
+POST http://localhost:5000/api/url/shorten
 Content-Type: application/json
 
 {
