@@ -1,10 +1,27 @@
 const express = require('express');
 const connectDB = require('./config/db');
-
+const cors = require('cors');
 const app = express();
 
 //Connect to Database
 connectDB();
+
+let corsOrigins=[];
+
+if(process.env.REQUEST_ORIGIN){
+    corsOrigins=[process.env.REQUEST_ORIGIN];
+}
+else{
+    corsOrigins=["http://localhost:3000"];
+}
+const corsOptions = {
+    origin: corsOrigins,
+    methods:['POST'],
+    allowedHeaders: ['Content-Type', 'application/json']   
+};
+
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ extended:false }));
 
