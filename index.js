@@ -12,7 +12,7 @@ if(process.env.REQUEST_ORIGIN){
     corsOrigins=[process.env.REQUEST_ORIGIN];
 }
 else{
-    corsOrigins=["http://localhost:3000"];
+    corsOrigins=["http://localhost:5173"];
 }
 const corsOptions = {
     origin: corsOrigins,
