@@ -6,19 +6,12 @@ const app = express();
 //Connect to Database
 connectDB();
 
-let corsOrigins=[];
-
-if(process.env.REQUEST_ORIGIN){
-    corsOrigins=[process.env.REQUEST_ORIGIN];
+const cors=require("cors");
+const corsOptions ={
+   origin:'*', 
+   credentials:true,            //access-control-allow-credentials:true
+   optionSuccessStatus:200,
 }
-else{
-    corsOrigins=["http://localhost:5173"];
-}
-const corsOptions = {
-    origin: corsOrigins,
-    methods:['POST'],
-    allowedHeaders: ['Content-Type', 'application/json']   
-};
 
 
 app.use(cors(corsOptions));
