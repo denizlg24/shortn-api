@@ -1,0 +1,13 @@
+POST https://shortn-api-mofx.vercel.app/api/url/shorten
+Content-Type: application/json
+
+{
+    "longUrl" : "https://www.youtube.com/watch?v=2Fwvb_I0Gmo"
+}
+
+//POST http://localhost:5000/api/url/stats
+//Content-Type: application/json
+
+//{
+    //"shortUrl" : "http://localhost:5000/6eUWMfhBy"
+//}
