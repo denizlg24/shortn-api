@@ -1,13 +1,7 @@
-POST http://localhost:5000/api/url/shorten
+
+POST http://shortn-21539.nodechef.com/api/url/stats
 Content-Type: application/json
 
 {
-    "longUrl" : "https://www.youtube.com/watch?v=2Fwvb_I0Gmo"
+    "shortUrl" : "http://shortn-21539.nodechef.com/wshAy-ahK"
 }
-
-//POST http://localhost:5000/api/url/stats
-//Content-Type: application/json
-
-//{
-    //"shortUrl" : "http://localhost:5000/6eUWMfhBy"
-//}

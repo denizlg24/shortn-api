@@ -9,7 +9,7 @@ const router = express.Router();
 // @desc    Create short URL
 router.post("/shorten", async (req, res) => {
   const { longUrl } = req.body;
-  const baseUrl ="http://localhost:5000";
+  const baseUrl ="http://shortn-21539.nodechef.com";
 
   //Check base url
   if (!validUrl.isUri(baseUrl)) {
