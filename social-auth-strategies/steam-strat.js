@@ -7,7 +7,7 @@ const steamStrat = new SteamStrategy({
     realm: 'https://shortn.at/',
     apiKey: process.env.STEAM_API_KEY,
   },
-  function(identifier, profile, done) {
+  function(identifier, profile, cb) {
       return cb(null, profile);
   }
 )
