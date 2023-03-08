@@ -18,9 +18,12 @@ const urlSchema = new mongoose.Schema({
 });
 
 urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
+
   // Increment total click count
   this.clicks.total++;
   this.clicks.lastClick = new Date().toString();
+
+  const browserKey = browser.replace(/\./g, '');
   
   // Increment click count for country
     if (!this.clicks.byCountry.has(countryCode)) {
@@ -37,10 +40,10 @@ urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
   this.clicks.byTimeOfDay.set(hour, this.clicks.byTimeOfDay.get(hour) + 1);
   
   //by browser
-  if (!this.clicks.byBrowser.has(browser)) {
-    this.clicks.byBrowser.set(browser, 0);
+  if (!this.clicks.byBrowser.has(browserKey)) {
+    this.clicks.byBrowser.set(browserKey, 0);
   }
-  this.clicks.byBrowser.set(browser, this.clicks.byBrowser.get(browser) + 1);
+  this.clicks.byBrowser.set(browserKey, this.clicks.byBrowser.get(browserKey) + 1);
 
   //by os
   if (!this.clicks.byOperatingSystem.has(os)) {
