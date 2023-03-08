@@ -17,14 +17,17 @@ const urlSchema = new mongoose.Schema({
   }
 });
 
-urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
+urlSchema.methods.recordClick = function(countryCode,browser,osKey,deviceKey) {
 
   // Increment total click count
   this.clicks.total++;
   this.clicks.lastClick = new Date().toString();
 
   const browserKey = browser.replace(/\./g, '');
-  
+  const osKey = osKey.replace(/\./g, '');
+  const deviceKey = deviceKey.replace(/\./g, '');
+
+
   // Increment click count for country
     if (!this.clicks.byCountry.has(countryCode)) {
       this.clicks.byCountry.set(countryCode, 0);
@@ -45,17 +48,17 @@ urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
   }
   this.clicks.byBrowser.set(browserKey, this.clicks.byBrowser.get(browserKey) + 1);
 
-  //by os
-  if (!this.clicks.byOperatingSystem.has(os)) {
-    this.clicks.byOperatingSystem.set(os, 0);
+  //by osKey
+  if (!this.clicks.byOperatingSystem.has(osKey)) {
+    this.clicks.byOperatingSystem.set(osKey, 0);
   }
-  this.clicks.byOperatingSystem.set(os, this.clicks.byOperatingSystem.get(os) + 1);
+  this.clicks.byOperatingSystem.set(osKey, this.clicks.byOperatingSystem.get(osKey) + 1);
 
-  //by device
-  if (!this.clicks.byDevice.has(device)) {
-    this.clicks.byDevice.set(device, 0);
+  //by deviceKey
+  if (!this.clicks.byDevice.has(deviceKey)) {
+    this.clicks.byDevice.set(deviceKey, 0);
   }
-  this.clicks.byDevice.set(device, this.clicks.byDevice.get(device) + 1);
+  this.clicks.byDevice.set(deviceKey, this.clicks.byDevice.get(deviceKey) + 1);
 
   // Save changes to database
   return this.save();
