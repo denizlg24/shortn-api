@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const geoip = require("geoip-lite");
+const useragent = require('useragent');
+useragent(true);
 
 function getCountryCodeFromRequest(req) {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
@@ -20,9 +22,12 @@ router.get("/:code", async (req, res) => {
     if (url) {
       // Get country code from request
       const countryCode = getCountryCodeFromRequest(req);
-
+      const userAgent = useragent.parse(req.headers['user-agent']);
+      const browser = userAgent.toAgent();
+      const os = userAgent.os.toString();
+      const device = userAgent.device.toString();
       // Record click and update database
-      await url.recordClick(countryCode);
+      await url.recordClick(countryCode,browser,os,device);
 
       return res.redirect(url.longUrl);
     } else {

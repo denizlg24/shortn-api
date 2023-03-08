@@ -30,10 +30,13 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-steam": "^1.0.17",
     "path": "^0.12.7",
+    "request": "^2.88.2",
     "sendmail": "^1.6.1",
     "sendmail2": "^0.2.1",
     "shortid": "^2.2.16",
-    "valid-url": "^1.0.9"
+    "useragent": "^2.3.0",
+    "valid-url": "^1.0.9",
+    "yamlparser": "^0.0.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
