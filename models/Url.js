@@ -30,7 +30,7 @@ urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
 
   //by time of dayt
   const now = new Date();
-  const hour = now.getUTCHours();
+  const hour = now.getUTCHours().toString();
   if (!this.clicks.byTimeOfDay.has(hour)) {
     this.clicks.byTimeOfDay.set(hour, 0);
   }
@@ -53,7 +53,7 @@ urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
     this.clicks.byDevice.set(device, 0);
   }
   this.clicks.byDevice.set(device, this.clicks.byDevice.get(device) + 1);
-  
+
   // Save changes to database
   return this.save();
 };
