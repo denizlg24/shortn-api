@@ -9,7 +9,8 @@ const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const Token = require('../models/VerificationTokens');
 const generateUniqueId = require('generate-unique-id');
-
+const ejs = require('ejs');
+const path = require('path');
 
 // @route   POST /api/auth/register
 // @desc    Register User using email password
@@ -44,21 +45,27 @@ router.post("/register", async (req, res) => {
     if(err){
        return res.status(500).send({msg:err.message});
     }
-    const transporter = nodemailer.createTransport(
-        sendgridTransport({
-            auth:{
-                api_key:process.env.EMAIL_SECRET,
+    const hrefLink =  `https://shortn.at/api/auth/confirmation/${email}/${token.token}`
+    ejs.renderFile(path.join(__dirname,'/verification.mail.ejs'), { username , hrefLink }, {}, function(err, str) {
+      if (!err){
+        const transporter = nodemailer.createTransport(
+            sendgridTransport({
+                auth:{
+                    api_key:process.env.EMAIL_SECRET,
+                }
+            })
+        )
+        var mailOptions = { from: process.env.EMAIL_FROM, to: email, subject: 'Shortn Account Verification', html: str };
+        transporter.sendMail(mailOptions, function (err) {
+            if (err) { 
+                return res.status(500).json({msg:'Technical Issue!, Please click on resend for verify your Email.'});
             }
-        })
-    )
-    var mailOptions = { from: 'denizlg24@gmail.com', to: newUser.email, subject: 'Account Verification Link', html: '<h1>Hello '+ username +',</h1>\n\n' + '<h3>Please verify your Shortn account by clicking the link:' + '<a href="' + `https://shortn.at/api/auth/confirmation/${newUser.email}/${token.token}">Verify Account</a>` + '</h3>' + '\n\n<h4>Thank You!</h4>\n' };
-    transporter.sendMail(mailOptions, function (err) {
-        if (err) { 
-            return res.status(500).json({msg:'Technical Issue!, Please click on resend for verify your Email.'});
-         }
-      });
+        });
+        res.status(200).json("User Registered");
+      }
+      else {console.log(err);}
     });
-    res.status(200).json("User Registered");
+  });
   } catch (err) {
     console.error(err);
     res.status(500).json(`Server error: ${err}`);
