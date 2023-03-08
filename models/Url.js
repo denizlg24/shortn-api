@@ -17,7 +17,7 @@ const urlSchema = new mongoose.Schema({
   }
 });
 
-urlSchema.methods.recordClick = function(countryCode,browser,osKey,deviceKey) {
+urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
 
   // Increment total click count
   this.clicks.total++;
