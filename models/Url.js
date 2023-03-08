@@ -23,9 +23,9 @@ urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
   this.clicks.total++;
   this.clicks.lastClick = new Date().toString();
 
-  const browserKey = browser.replace(/\./g, '');
-  const osKey = os.replace(/\./g, '');
-  const deviceKey = device.replace(/\./g, '');
+  const browserKey = browser.replace(/\./g, '_');
+  const osKey = os.replace(/\./g, '_');
+  const deviceKey = device.replace(/\./g, '_');
 
 
   // Increment click count for country
