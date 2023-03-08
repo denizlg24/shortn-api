@@ -7,7 +7,7 @@ const app = express();
 const passport = require('passport');
 const googleStrat = require('./social-auth-strategies/google-strat');
 const githubStrat = require('./social-auth-strategies/github-strat');
-const facebookStrat = require('./social-auth-strategies/facebook-strat');
+const steamStrat = require('./social-auth-strategies/steam-strat');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
@@ -16,7 +16,7 @@ const User = require('./models/User');
 
 connectDB();
 passport.use(googleStrat);
-passport.use(facebookStrat);
+passport.use(steamStrat);
 passport.use(githubStrat);
 
 const corsOptions ={
@@ -54,7 +54,7 @@ app.use('/api/auth',require('./routes/auth'));
 app.get('/api/auth/google',passport.authenticate('google', { scope: ['profile','email'] }));
 
 app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { failureRedirect: 'https://shortn.at' }),
   async function(req, res) {
     // Successful authentication, redirect home.
     const rawUserData  = req.user._json;
@@ -89,7 +89,7 @@ app.get('/auth/google/callback',
 app.get('/api/auth/github',passport.authenticate('github', { scope: [ 'user', 'user:email' ] }));
 
 app.get('/auth/github/callback', 
-  passport.authenticate('github', { failureRedirect: '/login' }),
+  passport.authenticate('github', { failureRedirect: 'https://shortn.at' }),
   async function(req, res) {
     // Successful authentication, redirect home.
     const rawUserData  = req.user._json;
@@ -122,15 +122,14 @@ app.get('/auth/github/callback',
 
 
 
-app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
+app.get('/auth/steam/callback',
+  passport.authenticate('steam', { failureRedirect: 'https://shortn.at' }),
   function(req, res) {
     // Successful authentication, redirect home.
     console.log(req);
   });
 
-
-app.get('/api/auth/facebook',passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
+app.get('/api/auth/steam',passport.authenticate('steam'));
 
 
 
