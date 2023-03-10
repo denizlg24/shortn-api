@@ -46,7 +46,7 @@ var userSchema = new Schema({
   },
   plan:{
     type: Object,
-    default: {subscription: "free",lastPaid: Date.now}
+    default: {plan:[{subscription: "free"},{lastPaid: Date.now}]}
   }
 });
 
