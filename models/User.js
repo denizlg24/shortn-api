@@ -43,6 +43,10 @@ var userSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  plan:{
+    type: Object,
+    default: {subscription: "free",lastPaid: Date.now}
   }
 });
 
