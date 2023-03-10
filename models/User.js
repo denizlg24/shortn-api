@@ -47,7 +47,7 @@ var userSchema = new Schema({
     type: Object,
     default: {
       subscription: "free",
-      lastPaid: { type: Date, default: Date.now },
+      lastPaid: Date.now,
     },
   },
 });
