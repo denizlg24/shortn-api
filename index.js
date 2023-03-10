@@ -80,6 +80,10 @@ app.get(
           profilePicture: rawUserData.picture,
           emailVerified: rawUserData.email_verified,
           createdAt: new Date(),
+          plan: {
+            subscription:"free",
+            lastPaid:new Date(),
+          }
         });
         await newUser.save();
         const accessToken = jwt.sign(
@@ -126,6 +130,10 @@ app.get(
           profilePicture: rawUserData.avatar_url,
           emailVerified: true,
           createdAt: new Date(),
+          plan: {
+            subscription:"free",
+            lastPaid:new Date(),
+          }
         });
         await newUser.save();
         const accessToken = jwt.sign(
@@ -166,6 +174,10 @@ app.get(
           profilePicture: rawUserData.avatarfull,
           emailVerified: true,
           createdAt: new Date(),
+          plan: {
+            subscription:"free",
+            lastPaid:new Date(),
+          }
         });
         await newUser.save();
         const accessToken = jwt.sign(
