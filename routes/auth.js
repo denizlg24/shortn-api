@@ -184,11 +184,7 @@ router.get("/confirmation/:email/:verToken", async (req, res) => {
             }
             // account successfully verified
             else {
-              return res
-                .status(200)
-                .send(
-                  "Your account has been successfully verified. You may close this page!"
-                );
+              return res.redirect('https://shortn.at');
             }
           });
         }
