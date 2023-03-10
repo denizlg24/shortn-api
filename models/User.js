@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 /**
@@ -9,11 +9,11 @@ var userSchema = new Schema({
     type: String,
     required: true,
     default: "",
-    unique: [true,"idk anymore"]
+    unique: [true, "idk anymore"],
   },
   username: {
     type: String,
-    required: [true, "username not provided "]
+    required: [true, "username not provided "],
   },
   email: {
     type: String,
@@ -24,17 +24,16 @@ var userSchema = new Schema({
       validator: function (v) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
       },
-      message: '{VALUE} is not a valid email!'
-    }
-
+      message: "{VALUE} is not a valid email!",
+    },
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   profilePicture: {
     type: String,
-    default: ""
+    default: "",
   },
   emailVerified: {
     type: Boolean,
@@ -42,12 +41,15 @@ var userSchema = new Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  plan:{
+  plan: {
     type: Object,
-    default: {plan:[{subscription: "free"},{lastPaid: Date.now}]}
-  }
+    default: {
+      subscription: "free",
+      lastPaid: { type: Date, default: Date.now },
+    },
+  },
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
