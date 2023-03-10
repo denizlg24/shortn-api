@@ -36,6 +36,10 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       profilePicture: `https://avatar.oxro.io/avatar.svg?name=${username}`,
       createdAt: new Date(),
+      plan: {
+        subscription:"free",
+        lastPaid:new Date(),
+      }
     });
 
     await newUser.save();
