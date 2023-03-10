@@ -217,9 +217,9 @@ router.post("/logout", async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/subscription
+// @route   POST /api/auth/subscription
 // @desc    Get User Subscription
-router.get(
+router.post(
   "/subscription",
   authenticateTokenForSubscriptionCheck,
   async (req, res) => {
