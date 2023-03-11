@@ -34,6 +34,7 @@
     "sendmail": "^1.6.1",
     "sendmail2": "^0.2.1",
     "shortid": "^2.2.16",
+    "stripe": "^11.14.0",
     "useragent": "^2.3.0",
     "valid-url": "^1.0.9",
     "yamlparser": "^0.0.2"
