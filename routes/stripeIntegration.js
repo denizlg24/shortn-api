@@ -22,7 +22,7 @@ router.post('/create-checkout-session', async (req, res) => {
     ],
     mode: 'subscription',
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.DOMAIN}?canceled=true`,
+    cancel_url: `${process.env.DOMAIN}/?canceled=true`,
   });
 
   res.redirect(303, session.url);
