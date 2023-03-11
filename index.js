@@ -48,6 +48,7 @@ passport.deserializeUser(function (user, done) {
 app.use("/", require("./routes/index"));
 app.use("/api/url", require("./routes/url"));
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/subscription",require("./routes/stripeIntegration"));
 
 app.get(
   "/api/auth/google",
