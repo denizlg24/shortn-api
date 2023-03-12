@@ -109,15 +109,15 @@ router.post("/stats", async (req, res) => {
       }
       const ownersPlan = owner.plan.subscription;
       if (ownersPlan === "free") {
-        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick}});
+        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick},shortUrl});
       }
       if (ownersPlan === "basic") {
-        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total}});
+        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total},shortUrl});
       }
       if (ownersPlan === "plus") {
-        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total,byTimeOfDay:url.clicks.byTimeOfDay}});
+        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total,byTimeOfDay:url.clicks.byTimeOfDay},shortUrl});
       }
-      return res.status(200).json(url.clicks);
+      return res.status(200).json({clicks:url.clicks,shortUrl});
     } else {
       return res.status(404).json("The provided short URL was not found!");
     }
