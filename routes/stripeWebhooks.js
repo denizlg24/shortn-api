@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 
-router.post("/webhook", express.raw(), (request, response) => {
+router.post("/webhook", addRawBody, (request, response) => {
   const sig = request.headers["stripe-signature"];
 
   let event;
@@ -26,5 +26,21 @@ router.post("/webhook", express.raw(), (request, response) => {
   // Return a 200 response to acknowledge receipt of the event
   response.send();
 });
+
+function addRawBody(req, res, next) {
+    req.setEncoding('utf8');
+  
+    var data = '';
+  
+    req.on('data', function(chunk) {
+      data += chunk;
+    });
+  
+    req.on('end', function() {
+      req.rawBody = data;
+  
+      next();
+    });
+  }
 
 module.exports = router;

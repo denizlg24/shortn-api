@@ -28,7 +28,6 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use("/api/subscription",require('./routes/stripeWebhooks'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -51,6 +50,7 @@ app.use("/", require("./routes/index"));
 app.use("/api/url", require("./routes/url"));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/subscription",require("./routes/stripeIntegration"));
+app.use("/api/subscription",require('./routes/stripeWebhooks'));
 
 app.get(
   "/api/auth/google",
