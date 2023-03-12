@@ -76,11 +76,10 @@ app.get(
     } else {
       try {
         const sub = `google|${rawUserData.sub}`;
-        const stripeCustomer = stripe.customers.create({
+        const stripeCustomer = await stripe.customers.create({
           email: rawUserData.email,
           name: rawUserData.name,
         });
-        console.log(stripeCustomer);
         const newUser = new User({
           sub,
           displayName: rawUserData.name,
@@ -133,7 +132,7 @@ app.get(
     } else {
       try {
         const sub = `github|${rawUserData.id}`;
-        const stripeCustomer = stripe.customers.create({
+        const stripeCustomer = await stripe.customers.create({
           name: rawUserData.name,
         });
         const newUser = new User({
@@ -182,7 +181,7 @@ app.get(
     } else {
       try {
         const sub = `steam|${rawUserData.steamid}`;
-        const stripeCustomer = stripe.customers.create({
+        const stripeCustomer = await stripe.customers.create({
           name: rawUserData.personaname,
         });
         const newUser = new User({
