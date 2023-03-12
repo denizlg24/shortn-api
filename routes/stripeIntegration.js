@@ -56,7 +56,7 @@ router.post("/webhook", async (req, res) => {
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-  const planId = subscription.plan.id;
+  const planId = subscription.plan.nickname;
 
   const stripeId = subscription.customer;
 
@@ -64,14 +64,14 @@ router.post("/webhook", async (req, res) => {
     case "customer.subscription.created":
       await User.updateOne(
         { stripeId },
-        { $set: { plan: { subscription: planId === 'price_1Mkc7yFleAgEmQaAVHmisKYt'? "pro": (planId === 'price_1Mkc7WFleAgEmQaAF1ldZfIm' ? "plus" : "basic"), lastPaid: Date.now } } }
+        { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
       );
       break;
     case "customer.subscription.updated":
       console.log("here updated");
       await User.updateOne(
         { stripeId },
-        { $set: { plan: { subscription: planId === 'price_1Mkc7yFleAgEmQaAVHmisKYt'? "pro": (planId === 'price_1Mkc7WFleAgEmQaAF1ldZfIm' ? "plus" : "basic"), lastPaid: Date.now } } }
+        { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
       );
       break;
     case "customer.subscription.deleted":
