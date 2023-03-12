@@ -55,6 +55,8 @@ app.post(
       );
       console.log(event);
     } catch (err) {
+      console.log(request.rawBody);
+      console.log(typeof(request.rawBody));
       response.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -83,7 +85,6 @@ passport.deserializeUser(function (user, done) {
 app.use("/", require("./routes/index"));
 app.use("/api/url", require("./routes/url"));
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/subscription", require("./routes/stripeIntegration"));
 
 app.get(
   "/api/auth/google",
