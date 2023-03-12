@@ -28,16 +28,22 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use((req, res, next) => {
-  var url = req.originalUrl;
-  if (url.endsWith("/webhook")) {
-    next(); // Do nothing with the body because I need it in a raw state.
-  } else {
-    express.json()(req, res, next);  // ONLY do express.json() if the received request is NOT a WebHook from Stripe.
+app.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
+  const sig = request.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, process.env.WEBHOOK_SECRET_KEY);
+    console.log(event);
   }
+  catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Return a response to acknowledge receipt of the event
+  response.json({received: true});
 });
 
-app.use("/api/subscription", require("./routes/stripeWebhooks"));
+app.use(express.json());
 
 
 app.use(express.urlencoded({ extended: true }));
