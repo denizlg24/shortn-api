@@ -40,6 +40,8 @@ app.post('/api/subscription/webhook', express.raw({type: 'application/json'}), a
     console.log(event);
   }
   catch (err) {
+    console.log(rawBody);
+    console.log(typeof(rawBody));
     response.status(400).send(`Webhook Error: ${err.message}`);
   } 
 
