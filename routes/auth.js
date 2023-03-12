@@ -15,7 +15,7 @@ const path = require("path");
 // @route   POST /api/auth/register
 // @desc    Register User using email password
 router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, displayName } = req.body;
   const usernameFind = await User.findOne({ username, sub: /^authS/ });
   const emailFind = await User.findOne({ email, sub: /^authS/ });
   if (usernameFind) {
@@ -31,6 +31,7 @@ router.post("/register", async (req, res) => {
     const sub = `authS|${subId}`;
     const newUser = new User({
       sub,
+      displayName,
       username,
       email,
       password: hashedPassword,
@@ -55,7 +56,7 @@ router.post("/register", async (req, res) => {
       const hrefLink = `https://shortn.at/api/auth/confirmation/${email}/${token.token}`;
       ejs.renderFile(
         path.join(__dirname, "/verification.mail.ejs"),
-        { username, hrefLink },
+        { username:displayName , hrefLink },
         {},
         function (err, str) {
           if (!err) {

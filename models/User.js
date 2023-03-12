@@ -11,6 +11,11 @@ var userSchema = new Schema({
     default: "",
     unique: [true, "idk anymore"],
   },
+  displayName: {
+    type: String,
+    required: true,
+    default: "",
+  },
   username: {
     type: String,
     required: [true, "username not provided "],

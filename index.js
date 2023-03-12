@@ -75,6 +75,7 @@ app.get(
         const sub = `google|${rawUserData.sub}`;
         const newUser = new User({
           sub,
+          displayName: rawUserData.name,
           username: rawUserData.email.split("@")[0],
           email: rawUserData.email,
           password: "Does Not Apply",
@@ -125,6 +126,7 @@ app.get(
         const sub = `github|${rawUserData.id}`;
         const newUser = new User({
           sub,
+          displayName: rawUserData.name,
           username: rawUserData.login,
           email: "doesnotapply@doesnotapply.doesnotapply",
           password: "Does Not Apply",
@@ -169,6 +171,7 @@ app.get(
         const sub = `steam|${rawUserData.steamid}`;
         const newUser = new User({
           sub,
+          displayName: rawUserData.realname,
           username: rawUserData.personaname,
           email: "doesnotapply@doesnotapply.doesnotapply",
           password: "Does Not Apply",
