@@ -28,9 +28,19 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use("/api/subscription",require('./routes/stripeWebhooks'));
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      var url = req.originalUrl;
+      if (url.startsWith("/webhook")) {
+        req.rawBody = buf.toString();
+      }
+    },
+  })
+);
+app.use("/api/subscription", require("./routes/stripeWebhooks"));
 
-app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
@@ -50,8 +60,7 @@ passport.deserializeUser(function (user, done) {
 app.use("/", require("./routes/index"));
 app.use("/api/url", require("./routes/url"));
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/subscription",require("./routes/stripeIntegration"));
-
+app.use("/api/subscription", require("./routes/stripeIntegration"));
 
 app.get(
   "/api/auth/google",
@@ -86,9 +95,9 @@ app.get(
           emailVerified: rawUserData.email_verified,
           createdAt: new Date(),
           plan: {
-            subscription:"free",
-            lastPaid:new Date(),
-          }
+            subscription: "free",
+            lastPaid: new Date(),
+          },
         });
         await newUser.save();
         const accessToken = jwt.sign(
@@ -137,9 +146,9 @@ app.get(
           emailVerified: true,
           createdAt: new Date(),
           plan: {
-            subscription:"free",
-            lastPaid:new Date(),
-          }
+            subscription: "free",
+            lastPaid: new Date(),
+          },
         });
         await newUser.save();
         const accessToken = jwt.sign(
@@ -182,9 +191,9 @@ app.get(
           emailVerified: true,
           createdAt: new Date(),
           plan: {
-            subscription:"free",
-            lastPaid:new Date(),
-          }
+            subscription: "free",
+            lastPaid: new Date(),
+          },
         });
         await newUser.save();
         const accessToken = jwt.sign(
@@ -197,7 +206,6 @@ app.get(
         return res.status(500).json(`Server Error: ${err}`);
       }
     }
-
   }
 );
 
