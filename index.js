@@ -80,6 +80,7 @@ app.get(
           email: rawUserData.email,
           name: rawUserData.name,
         });
+        console.log(stripeCustomer);
         const newUser = new User({
           sub,
           displayName: rawUserData.name,
