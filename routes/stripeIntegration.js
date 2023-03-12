@@ -46,13 +46,7 @@ router.post("/create-portal-session", async (req, res) => {
 
 router.post(
   "/webhook",
-  bodyParser.raw({
-    type: "application/json",
-    verify: (req, res, buffer) => {
-      req.rawBody = buffer.toString();
-      return true;
-    },
-  }),
+  bodyParser.raw({ type: 'application/json' }),
   (request, response) => {
     const sig = request.headers["stripe-signature"];
 
