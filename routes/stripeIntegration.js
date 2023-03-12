@@ -1,10 +1,15 @@
+require("dotenv").config({path:'../.env'});
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-require("dotenv").config();
 
 router.post("/create-checkout-session", async (req, res) => {
+  const { sub } = req.body;
+  const buyingUser = await User.findOne({ sub });
+  if (!buyingUser) {
+    return res.status(404).json("User not found");
+  }
   const prices = await stripe.prices.list({
     lookup_keys: [req.body.lookup_key],
     expand: ["data.product"],
@@ -18,6 +23,9 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: 1,
       },
     ],
+    metadata: {
+      sub,
+    },
     mode: "subscription",
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.DOMAIN}/?canceled=true`,
