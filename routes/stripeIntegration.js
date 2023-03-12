@@ -1,4 +1,4 @@
-const stripe = require('stripe')('sk_test_51MkazBFleAgEmQaAaPRwpAUSZAm41WIIg50BzpVAOQex5pdA0vtezQi0icjLMCboBoWSLcgRpd1bcqZw9c4exiqj00YqwOGNJC');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const express = require('express');
 const router = express.Router();
 require('dotenv').config();
@@ -46,64 +46,24 @@ router.post('/create-portal-session', async (req, res) => {
   res.redirect(303, portalSession.url);
 });
 
-router.post(
-  '/webhook',
-  express.raw({ type: 'application/json' }),
-  (request, response) => {
-    let event = request.body;
-    // Replace this endpoint secret with your endpoint's unique secret
-    // If you are testing with the CLI, find the secret by running 'stripe listen'
-    // If you are using an endpoint defined with the API or dashboard, look in your webhook settings
-    // at https://dashboard.stripe.com/webhooks
-    const endpointSecret = process.env.WEBHOOK_SECRET_KEY;
-    // Only verify the event if you have an endpoint secret defined.
-    // Otherwise use the basic event deserialized with JSON.parse
-    if (endpointSecret) {
-      // Get the signature sent by Stripe
-      const signature = request.headers['stripe-signature'];
-      try {
-        event = stripe.webhooks.constructEvent(
-          request.body,
-          signature,
-          endpointSecret
-        );
-      } catch (err) {
-        console.log(`⚠️  Webhook signature verification failed.`, err.message);
-        return response.sendStatus(400);
-      }
-    }
-    let subscription;
-    let status;
-    // Handle the event
-    switch (event.type) {
-      case 'customer.subscription.deleted':
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription deleted.
-        // handleSubscriptionDeleted(subscriptionDeleted);
-        break;
-      case 'customer.subscription.created':
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription created.
-        // handleSubscriptionCreated(subscription);
-        break;
-      case 'customer.subscription.updated':
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription update.
-        // handleSubscriptionUpdated(subscription);
-        break;
-      default:
-        // Unexpected event type
-        console.log(`Unhandled event type ${event.type}.`);
-    }
-    // Return a 200 response to acknowledge receipt of the event
-    response.send();
+router.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
+  const sig = request.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, process.env.WEBHOOK_SECRET_KEY);
+    console.log(event);
+  } catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
   }
-);
+
+  // Handle the event
+  console.log(`Unhandled event type ${event.type}`);
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.send();
+});
 
 module.exports = router;
