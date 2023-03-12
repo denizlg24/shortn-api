@@ -28,16 +28,15 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use(
-  express.json({
-    verify: (req, res, buf) => {
-      var url = req.originalUrl;
-      if (url.startsWith("/webhook")) {
-        req.rawBody = buf.toString();
-      }
-    },
-  })
-);
+app.use((req, res, next) => {
+  var url = req.originalUrl;
+  if (url.endsWith("/webhook")) {
+    next(); // Do nothing with the body because I need it in a raw state.
+  } else {
+    express.json()(req, res, next);  // ONLY do express.json() if the received request is NOT a WebHook from Stripe.
+  }
+});
+
 app.use("/api/subscription", require("./routes/stripeWebhooks"));
 
 
