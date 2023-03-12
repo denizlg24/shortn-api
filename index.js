@@ -171,7 +171,7 @@ app.get(
         const sub = `steam|${rawUserData.steamid}`;
         const newUser = new User({
           sub,
-          displayName: rawUserData.realname,
+          displayName: rawUserData.personaname,
           username: rawUserData.personaname,
           email: "doesnotapply@doesnotapply.doesnotapply",
           password: "Does Not Apply",
