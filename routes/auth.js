@@ -155,6 +155,9 @@ router.post("/login", async (req, res) => {
 // @desc    Get user's info if authenticated
 router.get("/authenticate", authenticateToken, async (req, res) => {
   const user = await User.findOne({ sub: req.userData.sub });
+  if(!user){
+    return res.status(404).json("User not found");
+  }
   user.password = "Redacted";
   return res.status(200).json(user);
 });
