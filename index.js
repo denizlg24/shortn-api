@@ -31,39 +31,6 @@ app.use(express.static(path.join(__dirname, "dist")));
 
 app.use(express.json());
 
-app.post('/api/subscription/webhook', (req, res) => {
-  const event = req.body;
-
-  // Handle the event based on its type
-  switch (event.type) {
-    case 'customer.subscription.deleted':
-      // Handle subscription cancelled event
-      // Get the subscription ID from the event object
-      console.log(event.data.object.id)
-      // Update your database with the subscription cancellation information
-      // ...
-      break;
-    case 'customer.subscription.created':
-      // Handle subscription created event
-      // Get the subscription ID from the event object
-      console.log(event.data.object.id)
-      // Update your database with the subscription creation information
-      // ...
-      break;
-    case 'invoice.payment_succeeded':
-      // Handle subscription payment succeeded event
-      // Get the subscription ID from the event object
-      console.log(event.data.object.subscription);
-      // Update your database with the payment information
-      // ...
-      break;
-    // Add more cases to handle other subscription events as needed
-  }
-
-  // Return a 200 OK response to acknowledge receipt of the event
-  res.json({ received: true });
-});
-
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -84,6 +51,7 @@ passport.deserializeUser(function (user, done) {
 app.use("/", require("./routes/index"));
 app.use("/api/url", require("./routes/url"));
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/subscription",require("./routes/stripeIntegration"));
 
 app.get(
   "/api/auth/google",

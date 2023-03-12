@@ -1,9 +1,15 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const express = require("express");
 const router = express.Router();
+const User = require("../models/User");
 require("dotenv").config();
 
 router.post("/create-checkout-session", async (req, res) => {
+  const { sub } = req.body;
+  const buyingUser = await User.findOne({ sub });
+  if (!buyingUser) {
+    return res.status(404).json("User not found");
+  }
   const prices = await stripe.prices.list({
     lookup_keys: [req.body.lookup_key],
     expand: ["data.product"],
@@ -17,6 +23,9 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: 1,
       },
     ],
+    metadata: {
+      sub,
+    },
     mode: "subscription",
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.DOMAIN}/?canceled=true`,
@@ -41,6 +50,52 @@ router.post("/create-portal-session", async (req, res) => {
   });
 
   res.redirect(303, portalSession.url);
+});
+
+router.post("/webhook", async (req, res) => {
+  const event = req.body;
+
+  switch (event.type) {
+    case "customer.subscription.created":
+      const newsubscriptionId = event.data.object.id;
+
+      const newsubscription = await stripe.subscriptions.retrieve(newsubscriptionId);
+
+      const newplanId = newsubscription.plan.id;
+
+      const newsub = newsubscription.metadata.sub;
+      await User.updateOne(
+        { sub:newsub },
+        { $set: { plan: { subscription: newplanId, lastPaid: Date.now } } }
+      );
+      break;
+    case "customer.subscription.updated":
+      const subscriptionId = event.data.object.id;
+
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+      const planId = subscription.plan.id;
+
+      const sub = subscription.metadata.sub;
+      await User.updateOne(
+        { sub },
+        { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
+      );
+      break;
+    case "customer.subscription.deleted":
+      const deletedSubscriptionId = event.data.object.id;
+      const deletedSubscription = await stripe.subscriptions.retrieve(deletedSubscriptionId);
+      const deletedSub = deletedSubscription.metadata.sub;
+      await User.updateOne(
+        { sub:deletedSub },
+        { $set: { plan: { subscription: "free", lastPaid: Date.now } } }
+      );
+      break;
+    // Add more cases to handle other subscription events as needed
+  }
+
+  // Return a 200 OK response to acknowledge receipt of the event
+  res.json({ received: true });
 });
 
 module.exports = router;
