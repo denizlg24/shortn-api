@@ -44,6 +44,8 @@ app.post('/api/subscription/webhook', express.raw({type: 'application/json'}), (
   response.json({received: true});
 });
 
+app.use(express.json());
+
 
 app.use(express.urlencoded({ extended: true }));
 
