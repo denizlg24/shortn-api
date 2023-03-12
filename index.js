@@ -12,7 +12,6 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
-const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 connectDB();
 passport.use(googleStrat);
