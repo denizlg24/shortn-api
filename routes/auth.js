@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
   try {
     const subId = generateUniqueId();
     const sub = `authS|${subId}`;
-    const stripeCustomer = stripe.customers.create({
+    const stripeCustomer = await stripe.customers.create({
       email: email,
       name: displayName,
     });
