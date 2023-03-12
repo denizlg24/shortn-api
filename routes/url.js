@@ -117,7 +117,7 @@ router.post("/stats", async (req, res) => {
       if (ownersPlan === "plus") {
         return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total,byTimeOfDay:url.clicks.byTimeOfDay},shortUrl});
       }
-      return res.status(200).json({clicks:url.clicks,shortUrl});
+      return res.status(200).json(url);
     } else {
       return res.status(404).json("The provided short URL was not found!");
     }
