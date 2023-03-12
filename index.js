@@ -28,7 +28,7 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
+app.post('/api/subscription/webhook', express.raw({type: 'application/json'}), (request, response) => {
   const sig = request.headers['stripe-signature'];
   let event;
   try {
