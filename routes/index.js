@@ -27,7 +27,7 @@ router.get("/:code", async (req, res) => {
       const os = userAgent.os.toString();
       const device = userAgent.device.toString();
       // Record click and update database
-      await url.recordClick(countryCode,browser,os,device);
+      await url.recordClick(countryCode ? countryCode : "Other" ,browser,os,device);
 
       return res.redirect(url.longUrl);
     } else {
