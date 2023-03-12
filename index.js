@@ -14,7 +14,6 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
-
 connectDB();
 passport.use(googleStrat);
 passport.use(steamStrat);
@@ -30,19 +29,39 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.post('/api/subscription/webhook', express.raw({type: 'application/json'}), (request, response) => {
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(request.body, process.env.WEBHOOK_SIGN, process.env.WEBHOOK_SECRET_KEY);
-    console.log(event);
-  }
-  catch (err) {
-    response.status(400).send(`Webhook Error: ${err.message}`);
-  } 
+app.post(
+  "/api/subscription/webhook",
+  (req, res, next) => {
+    var data_stream = "";
+    req
+      .setEncoding("utf-8")
+      .on("data", function (data) {
+        data_stream += data;
+      })
+      .on("end", function () {
+        req.rawBody;
+        req.rawBody = data_stream;
+        next();
+      });
+  },
+  (request, response) => {
+    const sig = request.headers["stripe-signature"];
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        request.rawBody,
+        sig,
+        process.env.WEBHOOK_SECRET_KEY
+      );
+      console.log(event);
+    } catch (err) {
+      response.status(400).send(`Webhook Error: ${err.message}`);
+    }
 
-  // Return a response to acknowledge receipt of the event
-  response.json({received: true});
-});
+    // Return a response to acknowledge receipt of the event
+    response.json({ received: true });
+  }
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
