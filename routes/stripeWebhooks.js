@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 
-router.post("/webhook", express.raw, (request, response) => {
+router.post("/webhook", express.raw(), (request, response) => {
   const sig = request.headers["stripe-signature"];
 
   let event;
