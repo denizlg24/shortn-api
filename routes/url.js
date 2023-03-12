@@ -76,7 +76,7 @@ router.post("/shorten", async (req, res) => {
     if(previousUrl){
       return res.status(403).json("We are sorry, but that link is already taken.");
     }
-    
+
     const url = new Url({
       userId,
       urlCode,
@@ -109,7 +109,7 @@ router.post("/stats", async (req, res) => {
       }
       const ownersPlan = owner.plan.subscription;
       if (ownersPlan === "free") {
-        return res.status(200).json({clicks:url.clicks.lastClick});
+        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick}});
       }
       if (ownersPlan === "basic") {
         return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total}});
