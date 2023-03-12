@@ -1,4 +1,4 @@
-require("dotenv").config({path:'../.env'});
+require("dotenv").config({ path: "../.env" });
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const express = require("express");
 const router = express.Router();
@@ -23,14 +23,14 @@ router.post("/create-checkout-session", async (req, res) => {
       },
     ],
     metadata: {
-      sub:sub.toString(),
+      sub: sub.toString(),
     },
     mode: "subscription",
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.DOMAIN}/?canceled=true`,
   });
 
-  res.redirect(session.url);
+  res.redirect(303,session.url);
 });
 
 router.post("/create-portal-session", async (req, res) => {
@@ -54,36 +54,22 @@ router.post("/create-portal-session", async (req, res) => {
 router.post("/webhook", async (req, res) => {
   const event = req.body;
 
+  const subscriptionId = event.data.object.id;
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+  const planId = subscription.plan.id;
+
+  const sub = subscription.metadata.sub;
+
   switch (event.type) {
     case "customer.subscription.created":
-      const newsubscriptionId = event.data.object.id;
-
-      const newsubscription = await stripe.subscriptions.retrieve(newsubscriptionId,{
-        expand: ['metadata'],
-      });
-
-      const newplanId = newsubscription.plan.id;
-
-      const newsub = newsubscription.metadata.sub;
-      console.log(`newSubscriptionId: ${newsubscriptionId}, newSubscriptionMetadata: ${JSON.stringify(newsubscription.metadata)}`)
-      console.log(newsub);
-      console.log("here created");
       await User.updateOne(
-        { sub:newsub },
-        { $set: { plan: { subscription: newplanId, lastPaid: Date.now } } }
+        { sub },
+        { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
       );
       break;
     case "customer.subscription.updated":
-      const subscriptionId = event.data.object.id;
-
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId,{
-        expand: ['metadata'],
-      });
-
-      const planId = subscription.plan.id;
-
-      const sub = subscription.metadata.sub;
-      console.log(sub);
       console.log("here updated");
       await User.updateOne(
         { sub },
@@ -91,17 +77,11 @@ router.post("/webhook", async (req, res) => {
       );
       break;
     case "customer.subscription.deleted":
-      const deletedSubscriptionId = event.data.object.id;
-      const deletedSubscription = await stripe.subscriptions.retrieve(deletedSubscriptionId,{
-        expand: ['metadata'],
-      });
-      const deletedSub = deletedSubscription.metadata.sub;
-      console.log(deletedSub);
       console.log("here deleted");
       await User.updateOne(
-        { sub:deletedSub },
+        { sub },
         { $set: { plan: { subscription: "free", lastPaid: Date.now } } }
-      );
+      );  
       break;
     // Add more cases to handle other subscription events as needed
   }
