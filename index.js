@@ -55,9 +55,11 @@ app.post(
       );
       console.log(event);
     } catch (err) {
+      console.log(sig);
+      console.log(request.headers);
       console.log(request.rawBody);
       console.log(typeof(request.rawBody));
-      response.status(400).send(`Webhook Error: ${err.message}`);
+      return response.status(400).json(`Webhook Error: ${err.message}`);
     }
 
     // Return a response to acknowledge receipt of the event
