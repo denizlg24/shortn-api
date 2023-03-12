@@ -19,12 +19,11 @@ router.post("/create-checkout-session", async (req, res) => {
     line_items: [
       {
         price: prices.data[0].id,
-        // For metered billing, do not pass quantity
         quantity: 1,
       },
     ],
     metadata: {
-      sub,
+      sub:sub.toString(),
     },
     mode: "subscription",
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
@@ -59,7 +58,9 @@ router.post("/webhook", async (req, res) => {
     case "customer.subscription.created":
       const newsubscriptionId = event.data.object.id;
 
-      const newsubscription = await stripe.subscriptions.retrieve(newsubscriptionId);
+      const newsubscription = await stripe.subscriptions.retrieve(newsubscriptionId,{
+        expand: ['metadata'],
+      });
 
       const newplanId = newsubscription.plan.id;
 
@@ -75,7 +76,9 @@ router.post("/webhook", async (req, res) => {
     case "customer.subscription.updated":
       const subscriptionId = event.data.object.id;
 
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId,{
+        expand: ['metadata'],
+      });
 
       const planId = subscription.plan.id;
 
@@ -89,7 +92,9 @@ router.post("/webhook", async (req, res) => {
       break;
     case "customer.subscription.deleted":
       const deletedSubscriptionId = event.data.object.id;
-      const deletedSubscription = await stripe.subscriptions.retrieve(deletedSubscriptionId);
+      const deletedSubscription = await stripe.subscriptions.retrieve(deletedSubscriptionId,{
+        expand: ['metadata'],
+      });
       const deletedSub = deletedSubscription.metadata.sub;
       console.log(deletedSub);
       console.log("here deleted");
