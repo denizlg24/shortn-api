@@ -31,7 +31,7 @@ router.post("/create-checkout-session", async (req, res) => {
     cancel_url: `${process.env.DOMAIN}/?canceled=true`,
   });
 
-  res.redirect(303, session.url);
+  res.redirect(session.url);
 });
 
 router.post("/create-portal-session", async (req, res) => {
