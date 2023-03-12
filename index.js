@@ -29,43 +29,42 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.post(
-  "/api/subscription/webhook",
-  (req, res, next) => {
-    var data_stream = "";
-    req
-      .setEncoding("utf-8")
-      .on("data", function (data) {
-        data_stream += data;
-      })
-      .on("end", function () {
-        req.rawBody;
-        req.rawBody = data_stream;
-        next();
-      });
-  },
-  (request, response) => {
-    const sig = request.headers["stripe-signature"];
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        request.rawBody,
-        sig,
-        process.env.WEBHOOK_SECRET_KEY
-      );
-      console.log(event);
-    } catch (err) {
-      console.log(typeof(request.rawBody));
-      console.log(err);
-      return response.status(400).json(`Webhook Error: ${err.message}`);
-    }
-
-    // Return a response to acknowledge receipt of the event
-    response.json({ received: true });
-  }
-);
-
 app.use(express.json());
+
+app.post('/api/subscription/webhook', (req, res) => {
+  const event = req.body;
+
+  // Handle the event based on its type
+  switch (event.type) {
+    case 'customer.subscription.deleted':
+      // Handle subscription cancelled event
+      // Get the subscription ID from the event object
+      console.log(event.data.object.id)
+      // Update your database with the subscription cancellation information
+      // ...
+      break;
+    case 'customer.subscription.created':
+      // Handle subscription created event
+      // Get the subscription ID from the event object
+      console.log(event.data.object.id)
+      // Update your database with the subscription creation information
+      // ...
+      break;
+    case 'invoice.payment_succeeded':
+      // Handle subscription payment succeeded event
+      // Get the subscription ID from the event object
+      console.log(event.data.object.subscription);
+      // Update your database with the payment information
+      // ...
+      break;
+    // Add more cases to handle other subscription events as needed
+  }
+
+  // Return a 200 OK response to acknowledge receipt of the event
+  res.json({ received: true });
+});
+
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
