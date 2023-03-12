@@ -5,11 +5,6 @@ const User = require("../models/User");
 require("dotenv").config();
 
 router.post("/create-checkout-session", async (req, res) => {
-  const { sub } = req.body;
-  const buyingUser = await User.findOne({ sub });
-  if (!buyingUser) {
-    return res.status(404).json("User not found");
-  }
   const prices = await stripe.prices.list({
     lookup_keys: [req.body.lookup_key],
     expand: ["data.product"],
