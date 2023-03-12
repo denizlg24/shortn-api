@@ -13,7 +13,6 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
-const getRawBody = require('raw-body');
 
 
 connectDB();
@@ -31,17 +30,13 @@ app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.post('/api/subscription/webhook', express.raw({type: 'application/json'}), async (request, response) => {
-  const sig = request.headers['stripe-signature'];
-  const rawBody = await getRawBody(request);
+app.post('/api/subscription/webhook', express.raw({type: 'application/json'}), (request, response) => {
   let event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, process.env.WEBHOOK_SECRET_KEY);
+    event = stripe.webhooks.constructEvent(request.body, process.env.WEBHOOK_SIGN, process.env.WEBHOOK_SECRET_KEY);
     console.log(event);
   }
   catch (err) {
-    console.log(rawBody);
-    console.log(typeof(rawBody));
     response.status(400).send(`Webhook Error: ${err.message}`);
   } 
 
