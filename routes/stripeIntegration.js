@@ -15,6 +15,7 @@ router.post("/create-checkout-session", async (req, res) => {
     expand: ["data.product"],
   });
   const session = await stripe.checkout.sessions.create({
+    customer:buyingUser.stripeId.toString(),
     billing_address_collection: "auto",
     line_items: [
       {
@@ -22,15 +23,13 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: 1,
       },
     ],
-    metadata:{
-      'sub':sub.toString()
-    },
+    subscription_data: { metadata: { sub: sub.toString() } },
     mode: "subscription",
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.DOMAIN}/?canceled=true`,
   });
 
-  res.redirect(303,session.url);
+  res.redirect(303, session.url);
 });
 
 router.post("/create-portal-session", async (req, res) => {
@@ -59,29 +58,29 @@ router.post("/webhook", async (req, res) => {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
   const planId = subscription.plan.id;
-  console.log("dadw here " + JSON.stringify(subscription.metadata));
-  const sub = subscription.metadata['sub'];
+
+  const stripeId = subscription.customer;
 
   switch (event.type) {
     case "customer.subscription.created":
       await User.updateOne(
-        { sub },
+        { stripeId },
         { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
       );
       break;
     case "customer.subscription.updated":
       console.log("here updated");
       await User.updateOne(
-        { sub },
+        { stripeId },
         { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
       );
       break;
     case "customer.subscription.deleted":
       console.log("here deleted");
       await User.updateOne(
-        { sub },
+        { stripeId },
         { $set: { plan: { subscription: "free", lastPaid: Date.now } } }
-      );  
+      );
       break;
     // Add more cases to handle other subscription events as needed
   }

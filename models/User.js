@@ -16,10 +16,16 @@ var userSchema = new Schema({
     required: true,
     default: "",
   },
+  stripeId : {
+    type: String,
+    required: true,
+    default: "",
+  },
   username: {
     type: String,
     required: [true, "username not provided "],
   },
+
   email: {
     type: String,
     lowercase: true,

@@ -12,6 +12,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 connectDB();
 passport.use(googleStrat);
@@ -75,10 +76,15 @@ app.get(
     } else {
       try {
         const sub = `google|${rawUserData.sub}`;
+        const stripeCustomer = stripe.customers.create({
+          email: rawUserData.email,
+          name: rawUserData.name,
+        });
         const newUser = new User({
           sub,
           displayName: rawUserData.name,
           username: rawUserData.email.split("@")[0],
+          stripeId:stripeCustomer.id.toString(),
           email: rawUserData.email,
           password: "Does Not Apply",
           profilePicture: rawUserData.picture,
@@ -126,10 +132,14 @@ app.get(
     } else {
       try {
         const sub = `github|${rawUserData.id}`;
+        const stripeCustomer = stripe.customers.create({
+          name: rawUserData.name,
+        });
         const newUser = new User({
           sub,
           displayName: rawUserData.name,
           username: rawUserData.login,
+          stripeId:stripeCustomer.id.toString(),
           email: "doesnotapply@doesnotapply.doesnotapply",
           password: "Does Not Apply",
           profilePicture: rawUserData.avatar_url,
@@ -171,10 +181,14 @@ app.get(
     } else {
       try {
         const sub = `steam|${rawUserData.steamid}`;
+        const stripeCustomer = stripe.customers.create({
+          name: rawUserData.personaname,
+        });
         const newUser = new User({
           sub,
           displayName: rawUserData.personaname,
           username: rawUserData.personaname,
+          stripeId:stripeCustomer.id.toString(),
           email: "doesnotapply@doesnotapply.doesnotapply",
           password: "Does Not Apply",
           profilePicture: rawUserData.avatarfull,

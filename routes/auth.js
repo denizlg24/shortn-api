@@ -11,6 +11,7 @@ const Token = require("../models/VerificationTokens");
 const generateUniqueId = require("generate-unique-id");
 const ejs = require("ejs");
 const path = require("path");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 // @route   POST /api/auth/register
 // @desc    Register User using email password
@@ -29,18 +30,24 @@ router.post("/register", async (req, res) => {
   try {
     const subId = generateUniqueId();
     const sub = `authS|${subId}`;
+    const stripeCustomer = stripe.customers.create({
+      email: email,
+      name: displayName,
+    });
+
     const newUser = new User({
       sub,
       displayName,
       username,
       email,
+      stripeId:stripeCustomer.id.toString(),
       password: hashedPassword,
       profilePicture: `https://avatar.oxro.io/avatar.svg?name=${username}`,
       createdAt: new Date(),
       plan: {
-        subscription:"free",
-        lastPaid:new Date(),
-      }
+        subscription: "free",
+        lastPaid: new Date(),
+      },
     });
 
     await newUser.save();
@@ -56,7 +63,7 @@ router.post("/register", async (req, res) => {
       const hrefLink = `https://shortn.at/api/auth/confirmation/${email}/${token.token}`;
       ejs.renderFile(
         path.join(__dirname, "/verification.mail.ejs"),
-        { username:displayName , hrefLink },
+        { username: displayName, hrefLink },
         {},
         function (err, str) {
           if (!err) {
@@ -189,7 +196,7 @@ router.get("/confirmation/:email/:verToken", async (req, res) => {
             }
             // account successfully verified
             else {
-              return res.redirect('https://shortn.at');
+              return res.redirect("https://shortn.at");
             }
           });
         }
