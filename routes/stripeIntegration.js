@@ -64,6 +64,8 @@ router.post("/webhook", async (req, res) => {
       const newplanId = newsubscription.plan.id;
 
       const newsub = newsubscription.metadata.sub;
+      console.log(newsub);
+      console.log("here created");
       await User.updateOne(
         { sub:newsub },
         { $set: { plan: { subscription: newplanId, lastPaid: Date.now } } }
@@ -77,6 +79,8 @@ router.post("/webhook", async (req, res) => {
       const planId = subscription.plan.id;
 
       const sub = subscription.metadata.sub;
+      console.log(sub);
+      console.log("here updated");
       await User.updateOne(
         { sub },
         { $set: { plan: { subscription: planId, lastPaid: Date.now } } }
@@ -86,6 +90,8 @@ router.post("/webhook", async (req, res) => {
       const deletedSubscriptionId = event.data.object.id;
       const deletedSubscription = await stripe.subscriptions.retrieve(deletedSubscriptionId);
       const deletedSub = deletedSubscription.metadata.sub;
+      console.log(deletedSub);
+      console.log("here deleted");
       await User.updateOne(
         { sub:deletedSub },
         { $set: { plan: { subscription: "free", lastPaid: Date.now } } }
