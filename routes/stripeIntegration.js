@@ -64,7 +64,7 @@ router.post("/webhook", async (req, res) => {
       const newplanId = newsubscription.plan.id;
 
       const newsub = newsubscription.metadata.sub;
-      console.log(`newSubscriptionId: ${newsubscriptionId}, newSubscriptionMetadata: ${newsubscription.metadata}`)
+      console.log(`newSubscriptionId: ${newsubscriptionId}, newSubscriptionMetadata: ${JSON.stringify(newsubscription.metadata)}`)
       console.log(newsub);
       console.log("here created");
       await User.updateOne(
