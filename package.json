@@ -31,6 +31,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-steam": "^1.0.17",
     "path": "^0.12.7",
+    "raw-body": "^2.5.2",
     "request": "^2.88.2",
     "sendmail": "^1.6.1",
     "sendmail2": "^0.2.1",
