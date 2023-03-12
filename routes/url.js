@@ -1,15 +1,15 @@
 const express = require("express");
 const validUrl = require("valid-url");
 const shortID = require("shortid");
-
+const User = require("../models/User");
 const Url = require("../models/Url");
 const router = express.Router();
 
 // @route   POST /api/url/shorten
 // @desc    Create short URL
 router.post("/shorten", async (req, res) => {
-  const { longUrl, userId } = req.body;
-  const baseUrl ="https://shortn.at";
+  const { longUrl, userId, customCode } = req.body;
+  const baseUrl = "https://shortn.at";
 
   //Check base url
   if (!validUrl.isUri(baseUrl)) {
@@ -22,15 +22,62 @@ router.post("/shorten", async (req, res) => {
   }
 
   //Create url code
-  const urlCode = shortID.generate();
   try {
     /*let url = await Url.findOne({ longUrl });
     if (url) {
       res.json({ longUrl: url.longUrl, shortUrl: url.shortUrl });
     } else {*/
+    const owner = await User.findOne({ sub: userId });
+    if (!owner) {
+      return res.status(404).json("The user does no longer exist!");
+    }
+    const ownersPlan = owner.plan.subscription;
+    const ownersLinks = owner.links_this_month;
+    if (ownersPlan === "free") {
+      if (ownersLinks >= 3) {
+        return res
+          .status(403)
+          .json("You have exceeded your plan's URLS/month.");
+      }
+      if(customCode){
+        return res
+          .status(403)
+          .json("Your plan does not include a custom code!");
+      }
+    }
+    if (ownersPlan === "basic") {
+      if (ownersLinks >= 25) {
+        return res
+          .status(403)
+          .json("You have exceeded your plan's URLS/month.");
+      }
+      if(customCode){
+        return res
+          .status(403)
+          .json("Your plan does not include a custom code!");
+      }
+    }
+    if (ownersPlan === "plus") {
+      if (ownersLinks >= 50) {
+        return res
+          .status(403)
+          .json("You have exceeded your plan's URLS/month.");
+      }
+      if(customCode){
+        return res
+          .status(403)
+          .json("Your plan does not include a custom code!");
+      }
+    }
+    const urlCode = !customCode? shortID.generate() : customCode;
     const shortUrl = baseUrl + "/" + urlCode;
 
-    url = new Url({
+    const previousUrl = await Url.findOne({urlCode});
+    if(previousUrl){
+      return res.status(403).json("We are sorry, but that link is already taken.");
+    }
+    
+    const url = new Url({
       userId,
       urlCode,
       longUrl,
@@ -39,7 +86,7 @@ router.post("/shorten", async (req, res) => {
     });
 
     await url.save();
-
+    await owner.update({ $set: { links_this_month: ownersLinks + 1 } });
     res.json(url);
     //}
   } catch (err) {
@@ -55,7 +102,22 @@ router.post("/stats", async (req, res) => {
   try {
     let url = await Url.findOne({ shortUrl });
     if (url) {
-      res.json(url);
+      const sub = url.userId;
+      const owner = await User.findOne({ sub });
+      if (!owner) {
+        return res.status(404).json("The user does no longer exist!");
+      }
+      const ownersPlan = owner.plan.subscription;
+      if (ownersPlan === "free") {
+        return res.status(200).json({clicks:url.clicks.lastClick});
+      }
+      if (ownersPlan === "basic") {
+        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total}});
+      }
+      if (ownersPlan === "plus") {
+        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total,byTimeOfDay:url.clicks.byTimeOfDay}});
+      }
+      return res.status(200).json(url.clicks);
     } else {
       return res.status(404).json("The provided short URL was not found!");
     }
@@ -71,10 +133,10 @@ router.post("/userUrl", async (req, res) => {
   const { userId } = req.body;
   try {
     let url = await Url.find({ userId });
-    if(url) {
-       res.json(url);
+    if (url) {
+      res.json(url);
     } else {
-       return res.status(404).json("No Urls for this user");
+      return res.status(404).json("No Urls for this user");
     }
   } catch (err) {
     console.error(err);
