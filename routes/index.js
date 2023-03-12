@@ -22,6 +22,7 @@ router.get("/:code", async (req, res) => {
     if (url) {
       // Get country code from request
       const countryCode = getCountryCodeFromRequest(req);
+      console.log(countryCode);
       const userAgent = useragent.parse(req.headers['user-agent']);
       const browser = userAgent.toAgent();
       const os = userAgent.os.toString();
