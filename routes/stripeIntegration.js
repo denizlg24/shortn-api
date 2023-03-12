@@ -22,8 +22,8 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: 1,
       },
     ],
-    metadata: {
-      sub: sub.toString(),
+    metadata:{
+      'sub':sub.toString()
     },
     mode: "subscription",
     success_url: `${process.env.DOMAIN}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
@@ -34,7 +34,7 @@ router.post("/create-checkout-session", async (req, res) => {
 });
 
 router.post("/create-portal-session", async (req, res) => {
-  // For demonstration purposes, we're using the Checkout session to retrieve the customer ID.
+  // For demonstration purposes, we're using the Checkout sessio'n to retrieve the customer ID.
   // Typically this is stored alongside the authenticated user in your database.
   const { session_id } = req.body;
   const checkoutSession = await stripe.checkout.sessions.retrieve(session_id);
@@ -59,8 +59,8 @@ router.post("/webhook", async (req, res) => {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
   const planId = subscription.plan.id;
-
-  const sub = subscription.metadata.sub;
+  console.log("dadw here " + JSON.stringify(subscription.metadata));
+  const sub = subscription.metadata['sub'];
 
   switch (event.type) {
     case "customer.subscription.created":
