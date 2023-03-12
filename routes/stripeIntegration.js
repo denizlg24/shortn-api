@@ -29,7 +29,7 @@ router.post("/create-checkout-session", async (req, res) => {
     cancel_url: `${process.env.DOMAIN}/?canceled=true`,
   });
 
-  res.redirect(303, session.url);
+  res.json({url: session.url});
 });
 
 router.post("/create-portal-session", async (req, res) => {
@@ -47,7 +47,7 @@ router.post("/create-portal-session", async (req, res) => {
     return_url: returnUrl,
   });
 
-  res.redirect(303, portalSession.url);
+  res.json({url: portalSession.url});
 });
 
 router.post("/webhook", async (req, res) => {
