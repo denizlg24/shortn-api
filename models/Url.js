@@ -15,16 +15,11 @@ const urlSchema = new mongoose.Schema({
   }
 });
 
-urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
+urlSchema.methods.recordClick = function(countryCode,device) {
 
   // Increment total click count
   this.clicks.total++;
   this.clicks.lastClick = new Date().toString();
-
-  const browserKey = browser.replace(/\./g, '_');
-  const osKey = os.replace(/\./g, '_');
-  const deviceKey = device.replace(/\./g, '_');
-
 
   // Increment click count for country
     if (!this.clicks.byCountry.has(countryCode)) {
