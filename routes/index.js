@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const geoip = require("geoip-lite");
 const useragent = require('useragent');
+const DeviceDetector = require("device-detector-js");
 useragent(true);
 
 function getCountryCodeFromRequest(req) {
@@ -22,13 +23,11 @@ router.get("/:code", async (req, res) => {
     if (url) {
       // Get country code from request
       const countryCode = getCountryCodeFromRequest(req);
-      console.log(countryCode);
+      const deviceDetector = new DeviceDetector();
       const userAgent = useragent.parse(req.headers['user-agent']);
-      const browser = userAgent.toAgent();
-      const os = userAgent.os.toString();
-      const device = userAgent.device.toString();
+      const device = deviceDetector.parse(userAgent);
       // Record click and update database
-      await url.recordClick(countryCode ? countryCode : "Other" ,browser,os,device);
+      await url.recordClick(countryCode ? countryCode : "Other" , device);
 
       return res.redirect(url.longUrl);
     } else {

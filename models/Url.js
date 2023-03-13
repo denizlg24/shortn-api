@@ -10,9 +10,7 @@ const urlSchema = new mongoose.Schema({
     total: { type: Number, default: 0 },
     byCountry: { type: Map, of: Number, default: {} },
     byTimeOfDay: { type: Map, of: Number, default: {} },
-    byBrowser: { type: Map, of: Number, default: {} },
-    byOperatingSystem: { type: Map, of: Number, default: {} },
-    byDevice: { type: Map, of: Number, default: {} },
+    devices: {type: Array, of: Object, default: []},
     lastClick: {type: String, default: "Never"}
   }
 });
@@ -42,23 +40,8 @@ urlSchema.methods.recordClick = function(countryCode,browser,os,device) {
   }
   this.clicks.byTimeOfDay.set(hour, this.clicks.byTimeOfDay.get(hour) + 1);
   
-  //by browser
-  if (!this.clicks.byBrowser.has(browserKey)) {
-    this.clicks.byBrowser.set(browserKey, 0);
-  }
-  this.clicks.byBrowser.set(browserKey, this.clicks.byBrowser.get(browserKey) + 1);
-
-  //by osKey
-  if (!this.clicks.byOperatingSystem.has(osKey)) {
-    this.clicks.byOperatingSystem.set(osKey, 0);
-  }
-  this.clicks.byOperatingSystem.set(osKey, this.clicks.byOperatingSystem.get(osKey) + 1);
-
-  //by deviceKey
-  if (!this.clicks.byDevice.has(deviceKey)) {
-    this.clicks.byDevice.set(deviceKey, 0);
-  }
-  this.clicks.byDevice.set(deviceKey, this.clicks.byDevice.get(deviceKey) + 1);
+  //by device
+  this.clicks.devices.push(device);
 
   // Save changes to database
   return this.save();
