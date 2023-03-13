@@ -3,6 +3,7 @@ const validUrl = require("valid-url");
 const shortID = require("shortid");
 const User = require("../models/User");
 const Url = require("../models/Url");
+const { remove } = require("../models/User");
 const router = express.Router();
 
 // @route   POST /api/url/shorten
@@ -39,7 +40,7 @@ router.post("/shorten", async (req, res) => {
           .status(403)
           .json("You have exceeded your plan's URLS/month.");
       }
-      if(customCode){
+      if (customCode) {
         return res
           .status(403)
           .json("Your plan does not include a custom code!");
@@ -51,7 +52,7 @@ router.post("/shorten", async (req, res) => {
           .status(403)
           .json("You have exceeded your plan's URLS/month.");
       }
-      if(customCode){
+      if (customCode) {
         return res
           .status(403)
           .json("Your plan does not include a custom code!");
@@ -63,18 +64,20 @@ router.post("/shorten", async (req, res) => {
           .status(403)
           .json("You have exceeded your plan's URLS/month.");
       }
-      if(customCode){
+      if (customCode) {
         return res
           .status(403)
           .json("Your plan does not include a custom code!");
       }
     }
-    const urlCode = !customCode? shortID.generate() : customCode;
+    const urlCode = !customCode ? shortID.generate() : customCode;
     const shortUrl = baseUrl + "/" + urlCode;
 
-    const previousUrl = await Url.findOne({urlCode});
-    if(previousUrl){
-      return res.status(403).json("We are sorry, but that link is already taken.");
+    const previousUrl = await Url.findOne({ urlCode });
+    if (previousUrl) {
+      return res
+        .status(403)
+        .json("We are sorry, but that link is already taken.");
     }
 
     const url = new Url({
@@ -109,13 +112,32 @@ router.post("/stats", async (req, res) => {
       }
       const ownersPlan = owner.plan.subscription;
       if (ownersPlan === "free") {
-        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick},shortUrl});
+        return res
+          .status(200)
+          .json({ clicks: { lastClick: url.clicks.lastClick }, shortUrl });
       }
       if (ownersPlan === "basic") {
-        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total},shortUrl});
+        return res
+          .status(200)
+          .json({
+            clicks: {
+              lastClick: url.clicks.lastClick,
+              total: url.clicks.total,
+            },
+            shortUrl,
+          });
       }
       if (ownersPlan === "plus") {
-        return res.status(200).json({clicks:{lastClick:url.clicks.lastClick,total:url.clicks.total,byTimeOfDay:url.clicks.byTimeOfDay},shortUrl});
+        return res
+          .status(200)
+          .json({
+            clicks: {
+              lastClick: url.clicks.lastClick,
+              total: url.clicks.total,
+              byTimeOfDay: url.clicks.byTimeOfDay,
+            },
+            shortUrl,
+          });
       }
       return res.status(200).json(url);
     } else {
@@ -141,6 +163,21 @@ router.post("/userUrl", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json(`Server error: ${err}`);
+  }
+});
+
+// @route   POST /api/url/remove
+// @desc    Remove a specific url
+router.post("/remove", async (req, res) => {
+  const { shortUrl } = req.body;
+  try {
+    let removed = await Url.findOneAndRemove({ shortUrl });
+    if (removed) {
+      return res.status(200).json("Successfully Removed");
+    }
+    return res.status(404).json("No Url to remove");
+  } catch (err) {
+    return res.status(500).json(`Server error: ${err}`);
   }
 });
 
