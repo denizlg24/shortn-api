@@ -26,7 +26,7 @@ router.get("/:code", async (req, res) => {
       const deviceDetector = new DeviceDetector();
       const device = deviceDetector.parse(req.headers['user-agent']);
       // Record click and update database
-      await url.recordClick(country ? country : "Other" , device);
+      await url.recordClick(country ? country : {other:"Other"} , device);
 
       return res.redirect(url.longUrl);
     } else {
