@@ -8,24 +8,21 @@ const urlSchema = new mongoose.Schema({
   date: { type: String, default: Date.now },
   clicks: {
     total: { type: Number, default: 0 },
-    byCountry: { type: Map, of: Number, default: {} },
+    byCountry: { type: Array, of: Object, default: [] },
     byTimeOfDay: { type: Map, of: Number, default: {} },
     devices: {type: Array, of: Object, default: []},
     lastClick: {type: String, default: "Never"}
   }
 });
 
-urlSchema.methods.recordClick = function(countryCode,device) {
+urlSchema.methods.recordClick = function(country,device) {
 
   // Increment total click count
   this.clicks.total++;
   this.clicks.lastClick = new Date().toString();
 
   // Increment click count for country
-    if (!this.clicks.byCountry.has(countryCode)) {
-      this.clicks.byCountry.set(countryCode, 0);
-    }
-    this.clicks.byCountry.set(countryCode, this.clicks.byCountry.get(countryCode) + 1);
+  this.clicks.byCountry.push(country);
 
   //by time of dayt
   const now = new Date();

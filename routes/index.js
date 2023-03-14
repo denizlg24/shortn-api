@@ -8,7 +8,7 @@ useragent(true);
 function getCountryCodeFromRequest(req) {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const geo = geoip.lookup(ip);
-  return geo ? geo.country : "Other";
+  return geo ? geo : "Other";
 }
 
 const Url = require("../models/Url");
@@ -22,11 +22,11 @@ router.get("/:code", async (req, res) => {
 
     if (url) {
       // Get country code from request
-      const countryCode = getCountryCodeFromRequest(req);
+      const country = getCountryCodeFromRequest(req);
       const deviceDetector = new DeviceDetector();
       const device = deviceDetector.parse(req.headers['user-agent']);
       // Record click and update database
-      await url.recordClick(countryCode ? countryCode : "Other" , device);
+      await url.recordClick(country ? country : "Other" , device);
 
       return res.redirect(url.longUrl);
     } else {
