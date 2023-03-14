@@ -179,14 +179,17 @@ router.post("/remove", async (req, res) => {
           await owner.update({ $set: { links_this_month: ownersLinks - 1 } });
           return res.status(200).json("Removed the link and updated user.");
         } catch (err) {
+          console.log(err);
           return res.status(500).json(`Server error: ${err}`);
         }
       } catch (err) {
+        console.log(err);
         return res.status(500).json(`Server error: ${err}`);
       }
     }
     return res.status(404).json("No Url to remove");
   } catch (err) {
+    console.log(err);
     return res.status(500).json(`Server error: ${err}`);
   }
 });
