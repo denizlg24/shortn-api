@@ -89,7 +89,7 @@ router.post("/shorten", async (req, res) => {
     });
 
     await url.save();
-    await owner.update({ $set: { links_this_month: ownersLinks + 1 } });
+    await owner.updateOne({ $set: { links_this_month: ownersLinks + 1 } });
     res.json(url);
     //}
   } catch (err) {
@@ -176,7 +176,7 @@ router.post("/remove", async (req, res) => {
           return res.status(200).json("Removed the link but found no user.");
         }
         try {
-          await owner.update({ $set: { links_this_month: owner.links_this_month - 1 } });
+          await owner.updateOne({ $set: { links_this_month: owner.links_this_month - 1 } });
           return res.status(200).json("Removed the link and updated user.");
         } catch (err) {
           console.log(err);
