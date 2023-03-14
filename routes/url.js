@@ -117,27 +117,23 @@ router.post("/stats", async (req, res) => {
           .json({ clicks: { lastClick: url.clicks.lastClick }, shortUrl });
       }
       if (ownersPlan === "basic") {
-        return res
-          .status(200)
-          .json({
-            clicks: {
-              lastClick: url.clicks.lastClick,
-              total: url.clicks.total,
-            },
-            shortUrl,
-          });
+        return res.status(200).json({
+          clicks: {
+            lastClick: url.clicks.lastClick,
+            total: url.clicks.total,
+          },
+          shortUrl,
+        });
       }
       if (ownersPlan === "plus") {
-        return res
-          .status(200)
-          .json({
-            clicks: {
-              lastClick: url.clicks.lastClick,
-              total: url.clicks.total,
-              byTimeOfDay: url.clicks.byTimeOfDay,
-            },
-            shortUrl,
-          });
+        return res.status(200).json({
+          clicks: {
+            lastClick: url.clicks.lastClick,
+            total: url.clicks.total,
+            byTimeOfDay: url.clicks.byTimeOfDay,
+          },
+          shortUrl,
+        });
       }
       return res.status(200).json(url);
     } else {
@@ -173,7 +169,21 @@ router.post("/remove", async (req, res) => {
   try {
     let removed = await Url.findOneAndRemove({ shortUrl });
     if (removed) {
-      return res.status(200).json("Successfully Removed");
+      const sub = removed.userId;
+      try {
+        const owner = await User.findOne({ sub });
+        if (!owner) {
+          return res.status(200).json("Removed the link but found no user.");
+        }
+        try {
+          await owner.update({ $set: { links_this_month: ownersLinks - 1 } });
+          return res.status(200).json("Removed the link and updated user.");
+        } catch (err) {
+          return res.status(500).json(`Server error: ${err}`);
+        }
+      } catch (err) {
+        return res.status(500).json(`Server error: ${err}`);
+      }
     }
     return res.status(404).json("No Url to remove");
   } catch (err) {

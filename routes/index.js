@@ -24,9 +24,7 @@ router.get("/:code", async (req, res) => {
       // Get country code from request
       const countryCode = getCountryCodeFromRequest(req);
       const deviceDetector = new DeviceDetector();
-      console.log(req.headers['user-agent']);
       const device = deviceDetector.parse(req.headers['user-agent']);
-      console.log(device);
       // Record click and update database
       await url.recordClick(countryCode ? countryCode : "Other" , device);
 
